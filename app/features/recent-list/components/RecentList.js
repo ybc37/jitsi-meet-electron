@@ -1,5 +1,6 @@
 // @flow
 
+import Button from '@atlaskit/button';
 import moment from 'moment';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -13,6 +14,7 @@ import {
     TruncatedText
 } from '../styled';
 import type { RecentListItem } from '../types';
+import { removeRecentItem } from '../actions';
 
 type Props = {
 
@@ -59,6 +61,18 @@ class RecentList extends Component<Props, *> {
     }
 
     /**
+     * Remove recent list item by dispatching REMOVE_RECENT_ITEM.
+     *
+     * @param {Event} event - Event object.
+     * @param {RecentListItem} conference - Conference Details.
+     * @returns {void}
+     */
+    _removeRecentListItem(event: Event, conference: RecentListItem) {
+        event.stopPropagation();
+        this.props.dispatch(removeRecentItem(conference));
+    }
+
+    /**
      * Renders the conference card.
      *
      * @param {RecentListItem} conference - Conference Details.
@@ -81,6 +95,12 @@ class RecentList extends Component<Props, *> {
                 <TruncatedText>
                     { this._renderDuration(conference) }
                 </TruncatedText>
+                <Button
+                    appearance = 'warning'
+                    onClick = { e => this._removeRecentListItem(e, conference) }
+                    type = 'button'>
+                    Remove
+                </Button>
             </ConferenceCard>
         );
     }

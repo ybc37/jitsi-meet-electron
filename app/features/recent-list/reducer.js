@@ -3,6 +3,7 @@
 import { CONFERENCE_ENDED, CONFERENCE_JOINED } from '../conference';
 
 import type { RecentListItem } from './types';
+import { REMOVE_RECENT_ITEM } from './actionTypes';
 
 type State = {
     recentList: Array<RecentListItem>;
@@ -34,6 +35,12 @@ export default (state: State = DEFAULT_STATE, action: Object) => {
             recentList: _insertConference(state.recentList, action.conference)
         };
 
+    case REMOVE_RECENT_ITEM:
+        return {
+            ...state,
+            recentList: _removeConference(state.recentList, action.conference)
+        };
+
     default:
         return state;
     }
@@ -55,14 +62,29 @@ function _insertConference(
     newConference.startTime = Date.now();
 
     // Remove same conference.
-    const newRecentList: Array<RecentListItem> = recentList.filter(
-        (conference: RecentListItem) => conference.room !== newConference.room
-            || conference.serverURL !== newConference.serverURL);
+    const newRecentList: Array<RecentListItem> = _removeConference(recentList, newConference);
 
     // Add the conference at the beginning.
     newRecentList.unshift(newConference);
 
     return newRecentList;
+}
+
+/**
+ * Remove Conference from the recent list array.
+ *
+ * @param {Array<RecentListItem>} recentList - Previous recent list array.
+ * @param {RecentListItem} conference - Conference that has to be removed
+ * to recent list.
+ * @returns {Array<RecentListItem>} - Updated recent list array.
+ */
+function _removeConference(
+        recentList: Array<RecentListItem>,
+        conference: RecentListItem
+) {
+    return recentList.filter(
+        (c: RecentListItem) => c.room !== conference.room
+            || c.serverURL !== conference.serverURL);
 }
 
 /**
